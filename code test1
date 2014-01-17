@@ -1,0 +1,31 @@
+// BluetermDemo
+
+void setup() {
+  // 確定你的藍芽模組 baud rate 設定是 57600
+  Serial.begin(57600);
+
+  pinMode(2, OUTPUT);
+}
+void loop() {
+  if(Serial.available()){
+    // 讀出第 1 個字元
+    unsigned char charreceived = Serial.read();
+    
+    switch(charreceived){
+      case '1':
+        digitalWrite(2, HIGH);
+        Serial.println("  Arduino Led On");
+        break;
+      case '0':
+        digitalWrite(2, LOW);
+        Serial.println("  Arduino Led Off");
+        break;
+      default:
+        break;
+    }
+    
+    // 清掉後續的字元&#65292;我們只要第 1 個字元
+    Serial.flush();
+  }
+  delay(10);
+}  
