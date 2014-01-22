@@ -1,0 +1,74 @@
+String npw=""; 
+String change_password="";
+int charreceived;
+unsigned long npwn = 0; 
+int depw = 1234; 
+#include<Servo.h> //伺服機函式庫
+Servo lockservo; //定義伺服機變數
+int pos=0;
+int tcommand=0;
+// BluetermDemo
+
+void setup() {
+  // 確定你的藍芽模組 baud rate 設定是 57600
+  Serial.begin(57600);
+  pinMode(2, OUTPUT);
+  lockservo.attach(9);
+  lockservo.write(180); 
+}
+void loop() {
+if(Serial.available() ){
+  while( npw.length() < 9 ) {
+    npw += char(Serial.read()); 
+    delay(2);
+  } 
+  npwn = npw.toInt();
+  if ((npwn/100000) == depw){
+  charreceived = 1;
+  }
+  else{
+  charreceived = 0;
+  }
+    switch(charreceived){
+      case 1:    
+            if((npwn%10)==0){
+            digitalWrite(2, HIGH);
+            Serial.println(" Arduino Led On");
+            for(pos=180;pos>=1;pos-=1){
+             lockservo.write(pos);
+             delay(15);
+              }
+            }
+           else if((npwn%10)==1){
+             depw=(((npwn-(npwn%10))/10)%10000);
+              Serial.print(" The code has been changed to");
+              Serial.println(depw);
+            }
+            
+           
+       
+        break;
+        
+      case 0:
+        digitalWrite(2, LOW);
+        Serial.println("  Arduino Led Off");
+        Serial.print(" The code is wrong !");
+         Serial.println((npwn));
+         if(pos=0){
+             for(pos=0;pos<180;pos+=1){
+             lockservo.write(pos);
+             delay(15);
+             }
+         }
+       default:
+       Serial.println(npwn);
+       Serial.println(charreceived);
+        break;
+    }
+    
+    // 清掉後續的字元&#65292;我們只要第 1 個字元
+  Serial.flush();
+  delay(10);
+ npw="";
+}
+}
